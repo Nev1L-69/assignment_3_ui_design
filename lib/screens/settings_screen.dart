@@ -23,101 +23,115 @@ class SettingsScreen extends StatelessWidget {
         title: Text(localizations.settingsTitle),
       ),
       drawer: _buildDrawer(context),
-      body: Padding(
+      body: SingleChildScrollView(  // Добавляем возможность прокрутки
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              localizations.appearanceTitle,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(localizations.themeModeTitle),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ChoiceChip(
-                          label: const Text('Light'),
-                          selected: currentThemeMode == ThemeMode.light,
-                          onSelected: (selected) {
-                            if (selected) onThemeChanged(ThemeMode.light);
-                          },
-                        ),
-                        ChoiceChip(
-                          label: const Text('Dark'),
-                          selected: currentThemeMode == ThemeMode.dark,
-                          onSelected: (selected) {
-                            if (selected) onThemeChanged(ThemeMode.dark);
-                          },
-                        ),
-                        ChoiceChip(
-                          label: const Text('System'),
-                          selected: currentThemeMode == ThemeMode.system,
-                          onSelected: (selected) {
-                            if (selected) onThemeChanged(ThemeMode.system);
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Блок выбора темы
+            _buildThemeSection(localizations),
             const SizedBox(height: 24),
-            Text(
-              localizations.languageTitle,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(localizations.languageTitle),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ChoiceChip(
-                          label: const Text('English'),
-                          selected: currentLocale.languageCode == 'en',
-                          onSelected: (selected) {
-                            if (selected) onLocaleChanged(const Locale('en'));
-                          },
-                        ),
-                        ChoiceChip(
-                          label: const Text('Русский'),
-                          selected: currentLocale.languageCode == 'ru',
-                          onSelected: (selected) {
-                            if (selected) onLocaleChanged(const Locale('ru'));
-                          },
-                        ),
-                        ChoiceChip(
-                          label: const Text('Қазақша'),
-                          selected: currentLocale.languageCode == 'kk',
-                          onSelected: (selected) {
-                            if (selected) onLocaleChanged(const Locale('kk'));
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Блок выбора языка
+            _buildLanguageSection(localizations),
+            // Добавляем дополнительное пространство внизу
+            const SizedBox(height: 100),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildThemeSection(AppLocalizations localizations) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          localizations.appearanceTitle,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.themeModeTitle),
+                const SizedBox(height: 12),
+                SingleChildScrollView(  // Прокрутка для вариантов темы
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildThemeChoiceChip('Light', ThemeMode.light),
+                      const SizedBox(width: 8),
+                      _buildThemeChoiceChip('Dark', ThemeMode.dark),
+                      const SizedBox(width: 8),
+                      _buildThemeChoiceChip('System', ThemeMode.system),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThemeChoiceChip(String label, ThemeMode mode) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: currentThemeMode == mode,
+      onSelected: (selected) {
+        if (selected) onThemeChanged(mode);
+      },
+    );
+  }
+
+  Widget _buildLanguageSection(AppLocalizations localizations) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          localizations.languageTitle,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(localizations.languageTitle),
+                const SizedBox(height: 12),
+                SingleChildScrollView(  // Прокрутка для вариантов языка
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildLanguageChoiceChip('English', 'en'),
+                      const SizedBox(width: 8),
+                      _buildLanguageChoiceChip('Русский', 'ru'),
+                      const SizedBox(width: 8),
+                      _buildLanguageChoiceChip('Қазақша', 'kk'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLanguageChoiceChip(String label, String languageCode) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: currentLocale.languageCode == languageCode,
+      onSelected: (selected) {
+        if (selected) onLocaleChanged(Locale(languageCode));
+      },
     );
   }
 
