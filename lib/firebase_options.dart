@@ -33,7 +33,7 @@ class DefaultFirebaseOptions {
     appId: "1:676474124403:android:523e7cc5e7063986899206",
     messagingSenderId: "676474124403",
     projectId: "crossplatformassignment-4a91c",
-    storageBucket: "crossplatformassignment-4a91c.appspot.com",
+    storageBucket: "crossplatformassignment-4a91c.firebasestorage.app",
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
