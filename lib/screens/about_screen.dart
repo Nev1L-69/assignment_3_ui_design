@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/app_localization.dart';
+import '../services/auth_service.dart';
 
 class AboutScreen extends StatelessWidget {
   final Locale currentLocale;
@@ -9,11 +11,13 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
+    final authService = Provider.of<AuthService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.aboutTitle),
       ),
-      drawer: _buildDrawer(context),
+      drawer: _buildDrawer(context, localizations, authService),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -27,8 +31,7 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+  Widget _buildDrawer(BuildContext context, AppLocalizations localizations, AuthService authService) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -38,7 +41,7 @@ class AboutScreen extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             child: Text(
-              localizations.welcome,
+              localizations.navigation,
               style: const TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
@@ -53,16 +56,33 @@ class AboutScreen extends StatelessWidget {
             leading: const Icon(Icons.info),
             title: Text(localizations.aboutTitle),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // остаёмся на About
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: Text(localizations.settingsTitle),
-            onTap: () {
-              Navigator.pushNamed(context, '/settings');
-            },
-          ),
+          if (authService.isAuthenticated) ...[
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: Text(localizations.settingsTitle),
+              onTap: () {
+                Navigator.pushNamed(context, '/settings');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: Text(localizations.profileTitle),
+              onTap: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(localizations.logout),
+              onTap: () async {
+                await authService.logout();
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ],
       ),
     );

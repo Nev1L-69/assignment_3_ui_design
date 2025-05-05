@@ -12,13 +12,12 @@ class AppLocalizations {
     return localizations!;
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
       'homeTitle': 'Home Screen',
-      'welcome': 'Welcome to My App',
+      'welcome': 'Welcome',
       'about': 'About',
       'settings': 'Settings',
       'appearance': 'Appearance',
@@ -27,10 +26,15 @@ class AppLocalizations {
       'aboutText': 'This is a demo application showing navigation and settings implementation.',
       'itemTitle': 'Item @number',
       'itemDescription': 'Description of item @number',
+      'login': 'Login',
+      'profileTitle': 'Profile',
+      'navigation': 'Navigation',
+      'guestMode': 'You are in Guest Mode!',
+      'logout': 'Logout',
     },
     'ru': {
       'homeTitle': 'Главный экран',
-      'welcome': 'Добро пожаловать в мое приложение',
+      'welcome': 'Добро пожаловать',
       'about': 'О приложении',
       'settings': 'Настройки',
       'appearance': 'Внешний вид',
@@ -39,10 +43,15 @@ class AppLocalizations {
       'aboutText': 'Это демонстрационное приложение, показывающее реализацию навигации и настроек.',
       'itemTitle': 'Элемент @number',
       'itemDescription': 'Описание элемента @number',
+      'login': 'Вход',
+      'profileTitle': 'Профиль',
+      'navigation': 'Навигация',
+      'guestMode': 'Вы находитесь в гостевом режиме!',
+      'logout': 'Выход',
     },
     'kk': {
       'homeTitle': 'Басты экран',
-      'welcome': 'Менің қолданбама қош келдіңіз',
+      'welcome': 'Қош келдіңіз',
       'about': 'Қолданба туралы',
       'settings': 'Баптаулар',
       'appearance': 'Сыртқы түрі',
@@ -51,9 +60,15 @@ class AppLocalizations {
       'aboutText': 'Бұл навигация мен баптаулардың іске асырылуын көрсететін демонстрациялық қолданба.',
       'itemTitle': '@number элемент',
       'itemDescription': '@number элементінің сипаттамасы',
+      'login': 'Кіру',
+      'profileTitle': 'Профиль',
+      'navigation': 'Навигация',
+      'guestMode': 'Сіз қонақ режиміндесіз!',
+      'logout': 'Шығу',
     },
   };
 
+  // ПОЛУЧЕНИЕ ТЕКСТОВ
   String get homeTitle => _localizedValues[locale.languageCode]!['homeTitle']!;
   String get welcome => _localizedValues[locale.languageCode]!['welcome']!;
   String get aboutTitle => _localizedValues[locale.languageCode]!['about']!;
@@ -62,7 +77,12 @@ class AppLocalizations {
   String get themeModeTitle => _localizedValues[locale.languageCode]!['themeMode']!;
   String get languageTitle => _localizedValues[locale.languageCode]!['language']!;
   String get aboutText => _localizedValues[locale.languageCode]!['aboutText']!;
-  
+  String get login => _localizedValues[locale.languageCode]!['login']!;
+  String get profileTitle => _localizedValues[locale.languageCode]!['profileTitle']!;
+  String get navigation => _localizedValues[locale.languageCode]!['navigation']!;
+  String get guestMode => _localizedValues[locale.languageCode]!['guestMode']!;
+  String get logout => _localizedValues[locale.languageCode]!['logout']!;
+
   String itemTitle(int number) => _localizedValues[locale.languageCode]!['itemTitle']!.replaceAll('@number', number.toString());
   String itemDescription(int number) => _localizedValues[locale.languageCode]!['itemDescription']!.replaceAll('@number', number.toString());
 }

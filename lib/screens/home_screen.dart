@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/auth_service.dart';
 import '../services/app_localization.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   final Function(ThemeMode) onThemeChanged;
   final ThemeMode currentThemeMode;
   final Function(Locale) onLocaleChanged;
@@ -16,96 +18,66 @@ class HomeScreen extends StatefulWidget {
   });
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  List<int> itemNumbers = List.generate(20, (index) => index + 1);
-  Set<int> expandedItems = {};
-
-  @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.homeTitle),
+        actions: [
+          if (!authService.isAuthenticated)
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/login');
+              },
+              child: Text(
+                localizations.login,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          if (authService.isAuthenticated)
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+              child: Text(
+                localizations.profileTitle,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+        ],
       ),
-      drawer: _buildDrawer(context),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              localizations.welcome,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          if (!authService.isAuthenticated)
+            Container(
+              color: Colors.amber,
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                localizations.guestMode,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
           Expanded(
-            child: ListView.builder(
-              itemCount: itemNumbers.length,
-              itemBuilder: (context, index) {
-                final itemNumber = itemNumbers[index];
-                final isExpanded = expandedItems.contains(itemNumber);
-                return Dismissible(
-                  key: ValueKey(itemNumber),
-                  background: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20.0),
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    setState(() {
-                      itemNumbers.removeAt(index);
-                      expandedItems.remove(itemNumber);
-                    });
-                  },
-                  child: Card(
-                    margin: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.star),
-                          title: Text(localizations.itemTitle(itemNumber)),
-                          onTap: () {
-                            setState(() {
-                              if (isExpanded) {
-                                expandedItems.remove(itemNumber);
-                              } else {
-                                expandedItems.add(itemNumber);
-                              }
-                            });
-                          },
-                        ),
-                        if (isExpanded)
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(localizations.itemDescription(itemNumber)),
-                          ),
-                      ],
-                    ),
-                  ),
-                );
-              },
+            child: Center(
+              child: Text(
+                authService.isAuthenticated
+                    ? '${localizations.welcome}, ${authService.user?.email}!'
+                    : '${localizations.welcome}, Guest!',
+                style: const TextStyle(fontSize: 24),
+              ),
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            final newItemNumber = itemNumbers.isEmpty ? 1 : itemNumbers.last + 1;
-            itemNumbers.add(newItemNumber);
-          });
-        },
-        child: const Icon(Icons.add),
-      ),
+      drawer: _buildDrawer(context, localizations, authService),
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+  Widget _buildDrawer(BuildContext context, AppLocalizations localizations, AuthService authService) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -115,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Theme.of(context).primaryColor,
             ),
             child: Text(
-              localizations.welcome,
+              localizations.navigation,
               style: const TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
@@ -123,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             leading: const Icon(Icons.home),
             title: Text(localizations.homeTitle),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, '/');
             },
           ),
           ListTile(
@@ -140,6 +112,23 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.pushNamed(context, '/settings');
             },
           ),
+          if (authService.isAuthenticated) ...[
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: Text(localizations.profileTitle),
+              onTap: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(localizations.logout),
+              onTap: () async {
+                await authService.logout();
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ],
       ),
     );

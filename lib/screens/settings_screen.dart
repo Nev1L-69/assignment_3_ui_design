@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/app_localization.dart';
+import '../services/auth_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Function(ThemeMode) onThemeChanged;
@@ -18,22 +20,21 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
+    final authService = Provider.of<AuthService>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(localizations.settingsTitle),
       ),
-      drawer: _buildDrawer(context),
-      body: SingleChildScrollView(  // Добавляем возможность прокрутки
+      drawer: _buildDrawer(context, localizations, authService),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Блок выбора темы
             _buildThemeSection(localizations),
             const SizedBox(height: 24),
-            // Блок выбора языка
             _buildLanguageSection(localizations),
-            // Добавляем дополнительное пространство внизу
             const SizedBox(height: 100),
           ],
         ),
@@ -58,15 +59,15 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 Text(localizations.themeModeTitle),
                 const SizedBox(height: 12),
-                SingleChildScrollView(  // Прокрутка для вариантов темы
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildThemeChoiceChip('Light', ThemeMode.light),
+                      _buildThemeChoiceChip(localizations, 'light', ThemeMode.light),
                       const SizedBox(width: 8),
-                      _buildThemeChoiceChip('Dark', ThemeMode.dark),
+                      _buildThemeChoiceChip(localizations, 'dark', ThemeMode.dark),
                       const SizedBox(width: 8),
-                      _buildThemeChoiceChip('System', ThemeMode.system),
+                      _buildThemeChoiceChip(localizations, 'system', ThemeMode.system),
                     ],
                   ),
                 ),
@@ -78,7 +79,22 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeChoiceChip(String label, ThemeMode mode) {
+  Widget _buildThemeChoiceChip(AppLocalizations localizations, String labelKey, ThemeMode mode) {
+    String label;
+    switch (labelKey) {
+      case 'light':
+        label = 'Light'; // Если хочешь - можно добавить в локализацию
+        break;
+      case 'dark':
+        label = 'Dark';
+        break;
+      case 'system':
+        label = 'System';
+        break;
+      default:
+        label = labelKey;
+    }
+
     return ChoiceChip(
       label: Text(label),
       selected: currentThemeMode == mode,
@@ -105,7 +121,7 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 Text(localizations.languageTitle),
                 const SizedBox(height: 12),
-                SingleChildScrollView(  // Прокрутка для вариантов языка
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
@@ -135,8 +151,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawer(BuildContext context) {
-    final localizations = AppLocalizations.of(context);
+  Widget _buildDrawer(BuildContext context, AppLocalizations localizations, AuthService authService) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -146,7 +161,7 @@ class SettingsScreen extends StatelessWidget {
               color: Theme.of(context).primaryColor,
             ),
             child: Text(
-              localizations.welcome,
+              localizations.navigation,
               style: const TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
@@ -164,13 +179,30 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pushNamed(context, '/about');
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: Text(localizations.settingsTitle),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
+          if (authService.isAuthenticated) ...[
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: Text(localizations.settingsTitle),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: Text(localizations.profileTitle),
+              onTap: () {
+                Navigator.pushNamed(context, '/profile');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: Text(localizations.logout),
+              onTap: () async {
+                await authService.logout();
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ],
       ),
     );
