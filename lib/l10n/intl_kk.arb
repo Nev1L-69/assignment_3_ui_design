@@ -1,0 +1,19 @@
+{
+  "appTitle": "Күнделікті жоспарлаушы",
+  "login": "Кіру",
+  "register": "Тіркелу",
+  "email": "Эл. пошта",
+  "password": "Құпия сөз",
+  "logout": "Шығу",
+  "addTask": "Тапсырма қосу",
+  "taskTitle": "Тапсырма атауы",
+  "taskDescription": "Сипаттама",
+  "save": "Сақтау",
+  "settings": "Параметрлер",
+  "about": "Қосымша туралы",
+  "profile": "Профиль",
+  "history": "Тарих",
+  "theme": "Тақырып",
+  "language": "Тіл",
+  "offlineMode": "Офлайн режимі"
+}

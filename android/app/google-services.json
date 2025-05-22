@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "676474124403",
-    "project_id": "crossplatformassignment-4a91c",
-    "storage_bucket": "crossplatformassignment-4a91c.firebasestorage.app"
+    "project_number": "243005582361",
+    "project_id": "daily-planer-a301d",
+    "storage_bucket": "daily-planer-a301d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:676474124403:android:523e7cc5e7063986899206",
+        "mobilesdk_app_id": "1:243005582361:android:227b3b3fd0001685b28e88",
         "android_client_info": {
-          "package_name": "com.example.assignmentCrossplatform"
+          "package_name": "com.example.flutter_application_3"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBWMBHv2HVyub28J8MeB3XbWynyZ5lMzpk"
+          "current_key": "AIzaSyDPu9rzgVXGcaJxIzsRayEqDf6_pIZKdZE"
         }
       ],
       "services": {

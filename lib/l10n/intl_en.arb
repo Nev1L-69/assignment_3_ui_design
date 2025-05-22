@@ -1,0 +1,19 @@
+{
+  "appTitle": "Daily Planner",
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "logout": "Logout",
+  "addTask": "Add Task",
+  "taskTitle": "Task title",
+  "taskDescription": "Description",
+  "save": "Save",
+  "settings": "Settings",
+  "about": "About",
+  "profile": "Profile",
+  "history": "History",
+  "theme": "Theme",
+  "language": "Language",
+  "offlineMode": "Offline mode"
+}

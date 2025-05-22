@@ -1,40 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 
-class AuthService extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? _user;
+class AuthService {
+  static final _auth = FirebaseAuth.instance;
 
-  AuthService() {
-    _auth.authStateChanges().listen(_onAuthStateChanged);
+  static User? get currentUser => _auth.currentUser;
+
+  static Future<User?> signIn(String email, String password) async {
+    final cred = await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return cred.user;
   }
 
-  User? get user => _user;
-
-  bool get isAuthenticated => _user != null;
-
-  Future<void> register(String email, String password) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
-    } catch (e) {
-      throw Exception('Failed to register: $e');
-    }
+  static Future<User?> register(String email, String password) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return cred.user;
   }
 
-  Future<void> login(String email, String password) async {
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-    } catch (e) {
-      throw Exception('Failed to login: $e');
-    }
-  }
-
-  Future<void> logout() async {
-    await _auth.signOut();
-  }
-
-  void _onAuthStateChanged(User? firebaseUser) {
-    _user = firebaseUser;
-    notifyListeners(); // уведомить всех подписчиков (перерисовать экран)
-  }
+  static Future<void> signOut() async => await _auth.signOut();
 }

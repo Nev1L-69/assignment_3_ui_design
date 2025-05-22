@@ -1,0 +1,19 @@
+{
+  "appTitle": "Дневной планер",
+  "login": "Вход",
+  "register": "Регистрация",
+  "email": "Почта",
+  "password": "Пароль",
+  "logout": "Выйти",
+  "addTask": "Добавить задание",
+  "taskTitle": "Название задания",
+  "taskDescription": "Описание",
+  "save": "Сохранить",
+  "settings": "Настройки",
+  "about": "О приложении",
+  "profile": "Профиль",
+  "history": "История",
+  "theme": "Тема",
+  "language": "Язык",
+  "offlineMode": "Оффлайн режим"
+}

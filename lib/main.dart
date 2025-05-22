@@ -1,104 +1,116 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:provider/provider.dart'; // Новая строка
-
-
+import 'models/task.dart';
+import 'models/user_profile.dart';
+import 'providers/auth_provider.dart';
+import 'providers/theme_provider.dart';
+import 'providers/locale_provider.dart';
+import 'providers/task_provider.dart';
+import 'services/local_storage_service.dart';
+import 'services/firebase_service.dart';
+import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/about_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/login_screen.dart';
 import 'screens/profile_screen.dart';
-import 'services/app_localization.dart';
-import 'services/auth_service.dart'; // Новая строка
-
-import 'package:flutter/foundation.dart' show kIsWeb; // добавляем
-import 'firebase_options.dart'; // добавляем (файл с настройками)
+import 'screens/auth_screen.dart';
+import 'screens/history_screen.dart';
+import 'l10n/l10n.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  if (kIsWeb) {
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
-  } else {
-    await Firebase.initializeApp();
-  }
-
+  await Firebase.initializeApp();
+  await LocalStorageService.init();
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-  Locale _locale = const Locale('kk');
-
-  void changeTheme(ThemeMode newThemeMode) {
-    setState(() {
-      _themeMode = newThemeMode;
-    });
-  }
-
-  void changeLocale(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AuthService(), // Провайдер авторизации
-      child: Consumer<AuthService>(
-        builder: (context, authService, _) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => TaskProvider()),
+      ],
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, theme, locale, _) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'Flutter Navigation Demo',
-            theme: ThemeData.light(),
-            darkTheme: ThemeData.dark(),
-            themeMode: _themeMode,
-            locale: _locale,
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en', ''),
-              Locale('ru', ''),
-              Locale('kk', ''),
-            ],
+            title: 'Daily Planner',
+            theme: ThemeData(
+              colorScheme: ColorScheme.light(
+                primary: Colors.deepPurple,
+                secondary: Colors.deepPurpleAccent,
+                background: Colors.white.withOpacity(0.95),
+              ),
+              scaffoldBackgroundColor: Colors.white.withOpacity(0.95),
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.white.withOpacity(0.92),
+                foregroundColor: Colors.deepPurple,
+                elevation: 0,
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.88),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              cardColor: Colors.white.withOpacity(0.95),
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: Colors.deepPurpleAccent,
+              ),
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(color: Colors.deepPurple, fontSize: 17),
+                bodyMedium: TextStyle(color: Colors.deepPurple),
+              ),
+            ),
+            darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+              colorScheme: ColorScheme.dark(
+                primary: Colors.deepPurple,
+                secondary: Colors.purpleAccent,
+                background: Colors.black.withOpacity(0.94),
+              ),
+              scaffoldBackgroundColor: Colors.black.withOpacity(0.94),
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.black.withOpacity(0.9),
+                foregroundColor: Colors.deepPurple,
+                elevation: 0,
+              ),
+              cardColor: Colors.grey[900],
+              inputDecorationTheme: InputDecorationTheme(
+                filled: true,
+                fillColor: Colors.grey[900],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: Colors.deepPurple,
+              ),
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(color: Colors.white, fontSize: 17),
+                bodyMedium: TextStyle(color: Colors.white),
+              ),
+            ),
+            themeMode: theme.themeMode,
+            locale: locale.locale,
+            supportedLocales: L10n.supportedLocales,
+            localizationsDelegates: L10n.localizationsDelegates,
+            localeResolutionCallback: L10n.localeResolutionCallback,
             initialRoute: '/',
             routes: {
-              '/': (context) => HomeScreen(
-                    onThemeChanged: changeTheme,
-                    currentThemeMode: _themeMode,
-                    onLocaleChanged: changeLocale,
-                    currentLocale: _locale,
-                  ),
-              '/about': (context) => AboutScreen(currentLocale: _locale),
-              '/settings': (context) => SettingsScreen(
-                    onThemeChanged: changeTheme,
-                    currentThemeMode: _themeMode,
-                    onLocaleChanged: changeLocale,
-                    currentLocale: _locale,
-                  ),
-              '/login': (context) => const LoginScreen(), // ← добавляем это
-              '/profile': (context) => ProfileScreen(
-                    onThemeChanged: changeTheme,
-                    currentThemeMode: _themeMode,
-                    onLocaleChanged: changeLocale,
-                    currentLocale: _locale,
-              ),
-
+              '/': (_) => const SplashScreen(),
+              '/home': (_) => const HomeScreen(),
+              '/about': (_) => const AboutScreen(),
+              '/settings': (_) => const SettingsScreen(),
+              '/profile': (_) => const ProfileScreen(),
+              '/auth': (_) => const AuthScreen(),
+              '/history': (_) => const HistoryScreen(),
             },
           );
         },

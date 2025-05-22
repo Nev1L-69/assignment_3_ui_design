@@ -1,136 +1,170 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
-import '../services/app_localization.dart';
+import '../models/task.dart';
+import '../providers/task_provider.dart';
+import '../providers/theme_provider.dart';
+import '../providers/locale_provider.dart';
 
-class HomeScreen extends StatelessWidget {
-  final Function(ThemeMode) onThemeChanged;
-  final ThemeMode currentThemeMode;
-  final Function(Locale) onLocaleChanged;
-  final Locale currentLocale;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  const HomeScreen({
-    super.key,
-    required this.onThemeChanged,
-    required this.currentThemeMode,
-    required this.onLocaleChanged,
-    required this.currentLocale,
-  });
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController inputController = TextEditingController();
+
+  @override
+  void dispose() {
+    inputController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final authService = Provider.of<AuthService>(context);
-    final localizations = AppLocalizations.of(context);
+    final taskProvider = context.watch<TaskProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
+    final tasks = taskProvider.tasks;
+    final isLoading = taskProvider.isLoading;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.homeTitle),
+        title: const Text('Daily Planner'),
         actions: [
-          if (!authService.isAuthenticated)
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login');
-              },
-              child: Text(
-                localizations.login,
-                style: const TextStyle(color: Colors.white),
-              ),
+          // Языки
+          DropdownButton<Locale>(
+            value: localeProvider.locale,
+            underline: const SizedBox(),
+            onChanged: (v) {
+              if (v != null) localeProvider.setLocale(v);
+            },
+            items: const [
+              DropdownMenuItem(value: Locale('en'), child: Text('EN')),
+              DropdownMenuItem(value: Locale('ru'), child: Text('RU')),
+              DropdownMenuItem(value: Locale('kk'), child: Text('KK')),
+            ],
+          ),
+          // Тема
+          IconButton(
+            icon: Icon(
+              themeProvider.themeMode == ThemeMode.dark
+                  ? Icons.dark_mode
+                  : themeProvider.themeMode == ThemeMode.light
+                  ? Icons.light_mode
+                  : Icons.brightness_4,
             ),
-          if (authService.isAuthenticated)
-            TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/profile');
-              },
-              child: Text(
-                localizations.profileTitle,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
+            onPressed: () {
+              final next =
+                  themeProvider.themeMode == ThemeMode.light
+                      ? ThemeMode.dark
+                      : themeProvider.themeMode == ThemeMode.dark
+                      ? ThemeMode.system
+                      : ThemeMode.light;
+              themeProvider.setTheme(next);
+            },
+            tooltip: 'Switch Theme',
+          ),
+          // Переходы
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => Navigator.pushNamed(context, '/profile'),
+            tooltip: 'Profile',
+          ),
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () => Navigator.pushNamed(context, '/history'),
+            tooltip: 'History',
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => Navigator.pushNamed(context, '/about'),
+            tooltip: 'About',
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.pushNamed(context, '/settings'),
+            tooltip: 'Settings',
+          ),
         ],
       ),
-      body: Column(
-        children: [
-          if (!authService.isAuthenticated)
-            Container(
-              color: Colors.amber,
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                localizations.guestMode,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  Expanded(
+                    child:
+                        tasks.isEmpty
+                            ? const Center(child: Text('No tasks yet.'))
+                            : ListView.builder(
+                              itemCount: tasks.length,
+                              itemBuilder:
+                                  (_, i) => ListTile(
+                                    title: Text(tasks[i].title),
+                                    trailing: Checkbox(
+                                      value: tasks[i].isDone,
+                                      onChanged: (val) {
+                                        final updated = Task(
+                                          id: tasks[i].id,
+                                          title: tasks[i].title,
+                                          isDone: val ?? false,
+                                          created: tasks[i].created,
+                                        );
+                                        context.read<TaskProvider>().updateTask(
+                                          context,
+                                          updated,
+                                        );
+                                      },
+                                    ),
+                                    onLongPress:
+                                        () => context
+                                            .read<TaskProvider>()
+                                            .deleteTask(context, tasks[i].id),
+                                  ),
+                            ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: inputController,
+                            decoration: const InputDecoration(
+                              labelText: 'New Task',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final title = inputController.text.trim();
+                            if (title.isNotEmpty) {
+                              final task = Task(
+                                id:
+                                    DateTime.now().millisecondsSinceEpoch
+                                        .toString(),
+                                title: title,
+                                isDone: false,
+                                created: DateTime.now(),
+                              );
+                              await context.read<TaskProvider>().addTask(
+                                context,
+                                task,
+                              );
+                              inputController.clear();
+                            }
+                          },
+                          child: const Icon(Icons.add),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-          Expanded(
-            child: Center(
-              child: Text(
-                authService.isAuthenticated
-                    ? '${localizations.welcome}, ${authService.user?.email}!'
-                    : '${localizations.welcome}, Guest!',
-                style: const TextStyle(fontSize: 24),
-              ),
-            ),
-          ),
-        ],
-      ),
-      drawer: _buildDrawer(context, localizations, authService),
-    );
-  }
-
-  Widget _buildDrawer(BuildContext context, AppLocalizations localizations, AuthService authService) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-            ),
-            child: Text(
-              localizations.navigation,
-              style: const TextStyle(color: Colors.white, fontSize: 24),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home),
-            title: Text(localizations.homeTitle),
-            onTap: () {
-              Navigator.pushNamed(context, '/');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.info),
-            title: Text(localizations.aboutTitle),
-            onTap: () {
-              Navigator.pushNamed(context, '/about');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: Text(localizations.settingsTitle),
-            onTap: () {
-              Navigator.pushNamed(context, '/settings');
-            },
-          ),
-          if (authService.isAuthenticated) ...[
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: Text(localizations.profileTitle),
-              onTap: () {
-                Navigator.pushNamed(context, '/profile');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: Text(localizations.logout),
-              onTap: () async {
-                await authService.logout();
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
