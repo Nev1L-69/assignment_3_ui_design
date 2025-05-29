@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "999365368162",
+    "project_id": "todolist-1c25c",
+    "storage_bucket": "todolist-1c25c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999365368162:android:233e24058452e75bbeb43b",
+        "android_client_info": {
+          "package_name": "com.adesh.firebase_task_manager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8avCbNT_hFLQ1mdjGdLahkZW2qR3jyWU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
