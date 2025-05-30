@@ -1,44 +1,29 @@
 workflows:
-  ios-native-workflow:
-    name: iOS Native (TestFlight) # Название рабочего процесса для тестового режима
+  ios-assignment-3-ui-design:
+    name: Assignment 3 UI Design (Simulator) # Название рабочего процесса для сборки под эмулятор
     max_build_duration: 120 # Максимальная длительность сборки (в минутах)
     instance_type: mac_mini_m2 # Тип виртуальной машины
-    integrations:
-      app_store_connect: codemagic # Интеграция с App Store Connect (должна быть настроена в Codemagic)
     environment:
-      ios_signing:
-        distribution_type: app_store # Тип распространения для TestFlight
-        bundle_identifier: io.codemagic.sample.iosnative # Идентификатор приложения, должен совпадать с App Store Connect
       vars:
-        BUNDLE_ID: "io.codemagic.sample.iosnative" # Идентификатор приложения
         XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя рабочего пространства Xcode
         XCODE_SCHEME: "CodemagicSample" # Имя схемы в Xcode
-        APP_STORE_APPLE_ID: 1555555551 # Apple ID приложения из App Store Connect
-      xcode: latest # Используем последнюю версию Xcode
-      cocoapods: default # Используем стандартную версию CocoaPods
+      xcode: latest # Последняя версия Xcode
+      cocoapods: default # Стандартная версия CocoaPods
     scripts:
       - name: Установка зависимостей CocoaPods
         script: |
           pod install # Установка зависимостей из Podfile
-      - name: Настройка профилей подписи
+      - name: Сборка приложения для симулятора
         script: |
-          xcode-project use-profiles --verbose # Настройка профилей с подробным логированием
-      - name: Увеличение номера сборки
-        script: |
-          cd $CM_BUILD_DIR
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1)) # Автоматическое увеличение номера сборки
-      - name: Сборка IPA для TestFlight
-        script: |
-          xcode-project build-ipa \
-            --workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
-            --scheme "$XCODE_SCHEME" \
-            --verbose # Сборка IPA с подробным логированием
+          xcodebuild build \
+            -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -verbose # Сборка для симулятора с подробным логированием
     artifacts:
-      - build/ios/ipa/*.ipa # Выходной IPA-файл
-      - /tmp/xcodebuild_logs/*.log # Логи для диагностики ошибок
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app # Приложение для симулятора
+      - /tmp/xcodebuild_logs/*.log # Логи для диагностики
     publishing:
       email:
         recipients:
@@ -47,10 +32,3 @@ workflows:
         notify:
           success: true # Уведомление при успешной сборке
           failure: false # Без уведомления при сбое
-      app_store_connect:
-        auth: integration # Аутентификация через интеграцию
-        submit_to_testflight: true # Отправка сборки в TestFlight
-        beta_groups: # Группы тестировщиков в TestFlight
-          - group name 1
-          - group name 2
-        submit_to_app_store: false # Отключена отправка в App Store
