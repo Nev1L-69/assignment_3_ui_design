@@ -42,13 +42,13 @@ android {
     }
 
     signingConfigs {
-        release {
-            keyAlias 'insert_your_key'
-            keyPassword 'insert_your_pass'
-            storeFile file('C:\\Users\\%username%\\StudioProjects\\firebase_task_manager\\firestore_task_manager.keystore')
-            storePassword 'insert_your_store_pass'
-        }
+    release {
+        keyAlias 'key'
+        keyPassword '123456'
+        storeFile file('C:/Users/baa20/AndroidStudioProjects/assignment_3_ui_design/task-manager.keystore')
+        storePassword '123456'
     }
+}
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).

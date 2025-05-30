@@ -1,0 +1,2 @@
+C:/Users/baa20/AndroidStudioProjects/assignment_3_ui_design/android/app/.cxx/RelWithDebInfo/6t1j6a4c/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/baa20/AndroidStudioProjects/assignment_3_ui_design/android/app/.cxx/RelWithDebInfo/6t1j6a4c/armeabi-v7a/CMakeFiles/rebuild_cache.dir

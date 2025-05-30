@@ -1,0 +1,2 @@
+C:/Users/baa20/AndroidStudioProjects/assignment_3_ui_design/android/app/.cxx/Debug/3g2g3ky2/x86/CMakeFiles/edit_cache.dir
+C:/Users/baa20/AndroidStudioProjects/assignment_3_ui_design/android/app/.cxx/Debug/3g2g3ky2/x86/CMakeFiles/rebuild_cache.dir
