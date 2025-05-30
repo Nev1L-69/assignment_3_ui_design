@@ -1,17 +1,17 @@
 workflows:
   ios-native-workflow:
-    name: iOS Native (TestFlight)
-    max_build_duration: 120
-    instance_type: mac_mini_m2
+    name: iOS Native (TestFlight) # Название рабочего процесса для тестового режима
+    max_build_duration: 120 # Максимальная длительность сборки (в минутах)
+    instance_type: mac_mini_m2 # Тип виртуальной машины
     integrations:
-      app_store_connect: codemagic # Убедитесь, что интеграция с именем "codemagic" настроена в Codemagic
+      app_store_connect: codemagic # Интеграция с App Store Connect (должна быть настроена в Codemagic)
     environment:
       ios_signing:
         distribution_type: app_store # Тип распространения для TestFlight
-        bundle_identifier: io.codemagic.sample.iosnative # Идентификатор приложения
+        bundle_identifier: io.codemagic.sample.iosnative # Идентификатор приложения, должен совпадать с App Store Connect
       vars:
-        BUNDLE_ID: "io.codemagic.sample.iosnative" # Должен совпадать с идентификатором в Xcode и App Store Connect
-        XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя вашего рабочего пространства Xcode
+        BUNDLE_ID: "io.codemagic.sample.iosnative" # Идентификатор приложения
+        XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя рабочего пространства Xcode
         XCODE_SCHEME: "CodemagicSample" # Имя схемы в Xcode
         APP_STORE_APPLE_ID: 1555555551 # Apple ID приложения из App Store Connect
       xcode: latest # Используем последнюю версию Xcode
@@ -19,24 +19,24 @@ workflows:
     scripts:
       - name: Установка зависимостей CocoaPods
         script: |
-          pod install
-      - name: Настройка профилей подписи в проекте Xcode
+          pod install # Установка зависимостей из Podfile
+      - name: Настройка профилей подписи
         script: |
-          xcode-project use-profiles --verbose # Включаем подробное логирование для диагностики
+          xcode-project use-profiles --verbose # Настройка профилей с подробным логированием
       - name: Увеличение номера сборки
         script: |
           cd $CM_BUILD_DIR
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
-          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
-      - name: Сборка IPA для распространения
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1)) # Автоматическое увеличение номера сборки
+      - name: Сборка IPA для TestFlight
         script: |
           xcode-project build-ipa \
             --workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME" \
-            --verbose # Включаем подробное логирование
+            --verbose # Сборка IPA с подробным логированием
     artifacts:
-      - build/ios/ipa/*.ipa # Собранный IPA-файл
-      - /tmp/xcodebuild_logs/*.log # Логи Xcode для диагностики
+      - build/ios/ipa/*.ipa # Выходной IPA-файл
+      - /tmp/xcodebuild_logs/*.log # Логи для диагностики ошибок
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
     publishing:
@@ -45,10 +45,10 @@ workflows:
           - user_1@example.com
           - user_2@example.com
         notify:
-          success: true # Уведомлять при успешной сборке
-          failure: false # Не уведомлять при сбое
+          success: true # Уведомление при успешной сборке
+          failure: false # Без уведомления при сбое
       app_store_connect:
-        auth: integration # Используем интеграцию App Store Connect
+        auth: integration # Аутентификация через интеграцию
         submit_to_testflight: true # Отправка сборки в TestFlight
         beta_groups: # Группы тестировщиков в TestFlight
           - group name 1
