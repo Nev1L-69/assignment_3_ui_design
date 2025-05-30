@@ -7,7 +7,7 @@ workflows:
       vars:
         XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя рабочего пространства Xcode
         XCODE_SCHEME: "CodemagicSample" # Имя схемы в Xcode
-      xcode: latest # Последняя версия Xcode
+      xcode: 15.4 # Последняя версия Xcode
     scripts:
       - name: Сборка приложения для симулятора
         script: |
@@ -16,6 +16,7 @@ workflows:
             -scheme "$XCODE_SCHEME" \
             -sdk iphonesimulator \
             -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 14' \
             -verbose # Сборка для симулятора с подробным логированием
     artifacts:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app # Приложение для симулятора
