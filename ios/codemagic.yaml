@@ -7,8 +7,8 @@ workflows:
       vars:
         XCODE_PROJECT: "ios/Runner.xcodeproj" # Путь к файлу проекта Xcode
         XCODE_SCHEME: "Runner" # Имя схемы для Flutter-проекта
-      xcode: 15.4 # Версия Xcode, указанная в предыдущем логе
-      flutter: stable # Используем стабильную версию Flutter
+      xcode: 15.4 # Версия Xcode, указанная в логе
+      flutter: stable # Стабильная версия Flutter
     scripts:
       - name: Установка зависимостей Flutter
         script: |
@@ -20,7 +20,8 @@ workflows:
             -scheme "$XCODE_SCHEME" \
             -sdk iphonesimulator \
             -configuration Debug \
-            -destination 'platform=iOS Simulator,name=iPhone 14' \
+            -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max,OS=17.5' \
+            CODE_SIGNING_ALLOWED=NO \
             -verbose # Сборка для симулятора с подробным логированием
     artifacts:
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app # Приложение для симулятора
