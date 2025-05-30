@@ -5,14 +5,18 @@ workflows:
     instance_type: mac_mini_m2 # Тип виртуальной машины
     environment:
       vars:
-        XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя рабочего пространства Xcode
-        XCODE_SCHEME: "CodemagicSample" # Имя схемы в Xcode
-      xcode: 15.4 # Последняя версия Xcode
+        XCODE_PROJECT: "ios/Runner.xcodeproj" # Путь к файлу проекта Xcode
+        XCODE_SCHEME: "Runner" # Имя схемы для Flutter-проекта
+      xcode: 15.4 # Версия Xcode, указанная в предыдущем логе
+      flutter: stable # Используем стабильную версию Flutter
     scripts:
+      - name: Установка зависимостей Flutter
+        script: |
+          flutter pub get # Установка зависимостей из pubspec.yaml
       - name: Сборка приложения для симулятора
         script: |
           xcodebuild build \
-            -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            -project "$CM_BUILD_DIR/$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
             -sdk iphonesimulator \
             -configuration Debug \
