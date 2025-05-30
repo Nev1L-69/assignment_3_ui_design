@@ -1,0 +1,31 @@
+workflows:
+  ios-native-workflow:
+    name: iOS Native (Simulator) # Название рабочего процесса для сборки под эмулятор
+    max_build_duration: 120 # Максимальная длительность сборки (в минутах)
+    instance_type: mac_mini_m2 # Тип виртуальной машины
+    environment:
+      vars:
+        XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя рабочего пространства Xcode
+        XCODE_SCHEME: "CodemagicSample" # Имя схемы в Xcode
+      xcode: 15.4 # Последняя версия Xcode
+    scripts:
+      - name: Сборка приложения для симулятора
+        script: |
+          xcodebuild build \
+            -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 14' \
+            -verbose # Сборка для симулятора с подробным логированием
+    artifacts:
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app # Приложение для симулятора
+      - /tmp/xcodebuild_logs/*.log # Логи для диагностики
+    publishing:
+      email:
+        recipients:
+          - user_1@example.com
+          - user_2@example.com
+        notify:
+          success: true # Уведомление при успешной сборке
+          failure: false # Без уведомления при сбое
