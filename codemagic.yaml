@@ -1,6 +1,6 @@
 workflows:
-  ios-assignment-3-ui-design:
-    name: Assignment 3 UI Design (Simulator) # Название рабочего процесса для сборки под эмулятор
+  ios-native-workflow:
+    name: iOS Native (Simulator) # Название рабочего процесса для сборки под эмулятор
     max_build_duration: 120 # Максимальная длительность сборки (в минутах)
     instance_type: mac_mini_m2 # Тип виртуальной машины
     environment:
