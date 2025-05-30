@@ -125,13 +125,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 120),
 
                   // Logo widget
-                  const Center(
-                    child: LogoWidget(
-                        imageName: "assets/images/task_manager_logo.png"),
-                  ),
+                  // const Center(
+                  //   child: LogoWidget(
+                  //       imageName: "assets/images/task_manager_logo.png"),
+                  // ),
 
                   const SizedBox(height: 30),
 

@@ -3,9 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import 'package:firebase_task_manager/reusables/color_gradiant_bg.dart';
 import 'package:firebase_task_manager/constants.dart';
+import 'package:firebase_task_manager/l10n/app_localizations.dart';
+import 'package:firebase_task_manager/providers/app_settings_provider.dart';
 
 class TaskFormScreen extends StatefulWidget {
   const TaskFormScreen({super.key});
@@ -83,11 +86,18 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<AppSettingsProvider>(context);
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid;
+    final loc = AppLocalizations.of(context);
+    final isDark = settings.isDarkTheme;
+    final bgColor = isDark ? Colors.brown[900] : homeScreenSecondaryBGColor;
+    final appBgColor = isDark ? const Color.fromARGB(255, 34, 21, 19) : homeScreenPrimaryBGColor;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         elevation: 6.0,
-        backgroundColor: homeScreenPrimaryBGColor,
+        backgroundColor: bgColor,
         shadowColor: Colors.black,
         title: Text(
           'New Task',
@@ -106,7 +116,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       ),
       body: Container(
         decoration: gradientBGDecoration(
-            homeScreenPrimaryBGColor, homeScreenSecondaryBGColor),
+            appBgColor, appBgColor),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
