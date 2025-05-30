@@ -8,11 +8,7 @@ workflows:
         XCODE_WORKSPACE: "CodemagicSample.xcworkspace" # Имя рабочего пространства Xcode
         XCODE_SCHEME: "CodemagicSample" # Имя схемы в Xcode
       xcode: latest # Последняя версия Xcode
-      cocoapods: default # Стандартная версия CocoaPods
     scripts:
-      - name: Установка зависимостей CocoaPods
-        script: |
-          pod install # Установка зависимостей из Podfile
       - name: Сборка приложения для симулятора
         script: |
           xcodebuild build \
