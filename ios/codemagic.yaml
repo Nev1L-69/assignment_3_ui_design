@@ -1,0 +1,35 @@
+workflows:
+  ios-native-workflow:
+    name: iOS Native (Simulator) # Название рабочего процесса для сборки под эмулятор
+    max_build_duration: 120 # Максимальная длительность сборки (в минутах)
+    instance_type: mac_mini_m2 # Тип виртуальной машины
+    environment:
+      vars:
+        XCODE_PROJECT: "ios/Runner.xcodeproj" # Путь к файлу проекта Xcode
+        XCODE_SCHEME: "Runner" # Имя схемы для Flutter-проекта
+      xcode: 15.4 # Версия Xcode, указанная в предыдущем логе
+      flutter: stable # Используем стабильную версию Flutter
+    scripts:
+      - name: Установка зависимостей Flutter
+        script: |
+          flutter pub get # Установка зависимостей из pubspec.yaml
+      - name: Сборка приложения для симулятора
+        script: |
+          xcodebuild build \
+            -project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'platform=iOS Simulator,name=iPhone 14' \
+            -verbose # Сборка для симулятора с подробным логированием
+    artifacts:
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/Products/Debug-iphonesimulator/*.app # Приложение для симулятора
+      - /tmp/xcodebuild_logs/*.log # Логи для диагностики
+    publishing:
+      email:
+        recipients:
+          - user_1@example.com
+          - user_2@example.com
+        notify:
+          success: true # Уведомление при успешной сборке
+          failure: false # Без уведомления при сбое
